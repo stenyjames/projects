@@ -13,8 +13,8 @@ via ant with maven-ant-tasks (http://maven.apache.org/ant-tasks/)
      
     <!-- artifact-properties -->
     <property name="artifact.group" value="libs-release-local" />
-    <property name="artifact.name" value="hello.war" />
-    <property name="artifact.version" value="3.9.2" />
+    <property name="artifact.name" value="hello" />
+    <property name="artifact.version" value="" />
     <property name="artifact.type" value="war" />
     <property name="artifact.pom" value="pom.xml" />
  
@@ -37,11 +37,11 @@ via ant with maven-ant-tasks (http://maven.apache.org/ant-tasks/)
     <target name="deploy">
         <artifact:pom id="tmp.pom" groupid="${artifact.group}" artifactid="${artifact.name}" version="${artifact.version}" packaging="${artifact.type}" name="${artifact.name}" />
         <artifact:writepom pomRefId="tmp.pom" file="${artifact.pom}"/>
-        <artifact:deploy file="${build.dir}/${artifact.name}-${artifact.version}.${artifact.type}">
+        <artifact:deploy file="${build.dir}/${artifact.name}.${artifact.type}">
             <remoteRepository url="${remote.repo.url}">
                 <authentication username="${remote.repo.username}" password="${remote.repo.password}" />
             </remoteRepository>
-            <attach file="${build.dir}/${artifact.name}" classifier="development" type="war file"/>
+            <attach file="${build.dir}/${artifact.name}.${artifact.type}" classifier="development" type="war file"/>
             <pom file="${artifact.pom}" />            
         </artifact:deploy>
     </target>
