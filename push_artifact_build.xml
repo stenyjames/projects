@@ -1,0 +1,54 @@
+<!-- 
+Sample-Project to demonstrate artifactory-deployment 
+via ant with maven-ant-tasks (http://maven.apache.org/ant-tasks/) 
+-->
+<project xmlns:artifact="antlib:org.apache.maven.artifact.ant" default="init">
+ 
+    <!-- directory-properties -->
+    <property name="build.dir" value="helloworld/dist" />
+    <property name="libs.dir" value="libs" />
+     
+    <!-- maven-ant-tasks jar -->
+    <property name="mvn.ant.tasks.jar" value="maven-ant-tasks-2.1.3.jar" />
+     
+    <!-- artifact-properties -->
+    <property name="artifact.group" value="libs-release-local" />
+    <property name="artifact.name" value="hello.war" />
+    <property name="artifact.version" value="3.9.2" />
+    <property name="artifact.type" value="war" />
+    <property name="artifact.pom" value="pom.xml" />
+ 
+    <!-- remote-repo -->
+    <property name="remote.repo.url" value="http://127.0.0.1:8081/artifactory" />
+    <property name="remote.repo.username" value="admin" />
+    <property name="remote.repo.password" value="password" />
+ 
+    <!-- including tha maven-ant-tasks-jar into classpath -->
+    <path id="maven-ant-tasks.classpath" path="${libs.dir}/${mvn.ant.tasks.jar}" />
+    <typedef resource="org/apache/maven/artifact/ant/antlib.xml" uri="antlib:org.apache.maven.artifact.ant" classpathref="maven-ant-tasks.classpath" />
+ 
+    <!-- init-task for coupling following tasks -->
+    <target name="init">
+        <antcall target="clean" />
+        <antcall target="deploy" />               
+    </target>
+ 
+    <!-- deploy-task for creating and writing a temporary pom-file and deploying the artifact beside this pom-file -->
+    <target name="deploy">
+        <artifact:pom id="tmp.pom" groupid="${artifact.group}" artifactid="${artifact.name}" version="${artifact.version}" packaging="${artifact.type}" name="${artifact.name}" />
+        <artifact:writepom pomRefId="tmp.pom" file="${artifact.pom}"/>
+        <artifact:deploy file="${build.dir}/${artifact.name}-${artifact.version}.${artifact.type}">
+            <remoteRepository url="${remote.repo.url}">
+                <authentication username="${remote.repo.username}" password="${remote.repo.password}" />
+            </remoteRepository>
+            <attach file="${build.dir}/${artifact.name}" classifier="development" type="war file"/>
+            <pom file="${artifact.pom}" />            
+        </artifact:deploy>
+    </target>
+     
+    <!-- clean-task for deletion of an earlier created temporary pom-file -->
+    <target name="clean">
+        <delete file="${artifact.pom}" />
+    </target>
+     
+</project>
